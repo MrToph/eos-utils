@@ -1,0 +1,48 @@
+{
+  "name": "@deltalabs/eos-utils",
+  "version": "0.0.1",
+  "description": "Various utility functions for EOS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./dist/cli.js",
+    "lint": "eslint . --ext '.js,.jsx,.ts,.tsx,.md'",
+    "prettier": "prettier -c --write '**/*'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrToph/eos-utils.git"
+  },
+  "keywords": [
+    "EOS",
+    "eosio",
+    "blockchain"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "author": "MrToph",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MrToph/eos-utils/issues"
+  },
+  "homepage": "https://github.com/MrToph/eos-utils#readme",
+  "devDependencies": {
+    "@types/node": "^12.12.7",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^23.0.4",
+    "eslint-plugin-markdown": "^1.0.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {}
+}
