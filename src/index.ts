@@ -1,3 +1,2 @@
-export default function test() {
-  console.log(`👋`);
-}
+export * from './name';
+export * from './symbol';

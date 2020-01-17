@@ -18,8 +18,14 @@ const eslintrc = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
-        "camelcase": "off"
+        "camelcase": "off",
+        "no-restricted-syntax": "off",
+        "prefer-const": "off",
+        "no-use-before-define": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "import/extensions": "off",
+        "import/prefer-default-export": "off"
       },
     },
   ],

@@ -10,7 +10,8 @@
     "start": "node ./dist/cli.js",
     "lint": "eslint . --ext '.js,.jsx,.ts,.tsx,.md'",
     "prettier": "prettier -c --write '**/*'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
   },
   "homepage": "https://github.com/MrToph/eos-utils#readme",
   "devDependencies": {
+    "@types/long": "^4.0.0",
     "@types/node": "^12.12.7",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
@@ -44,5 +46,8 @@
     "prettier": "^1.19.1",
     "typescript": "^3.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "eosjs": "^20.0.0",
+    "long": "^4.0.0"
+  }
 }
