@@ -32,7 +32,6 @@
   },
   "homepage": "https://github.com/MrToph/eos-utils#readme",
   "devDependencies": {
-    "@types/long": "^4.0.0",
     "@types/node": "^12.12.7",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
@@ -47,6 +46,7 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "@types/long": "^4.0.0",
     "eosjs": "^20.0.0",
     "long": "^4.0.0"
   }
