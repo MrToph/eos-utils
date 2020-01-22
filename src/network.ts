@@ -45,7 +45,7 @@ type CreateNetworkOptions = {
 };
 export const createNetworkRandomEndpoint = (
   networkName: NetworkName,
-  options: CreateNetworkOptions,
+  options?: CreateNetworkOptions,
 ) => {
   const endpoint = getDefaultHttpEndpoint(networkName);
   return createNetwork(networkName, endpoint, options);
