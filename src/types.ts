@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
+import { defaultCipherList } from 'constants';
 
 export type TEOSNetwork = {
+  networkName: NetworkName;
   chainId: string;
   nodeEndpoint: string;
   protocol: string;
@@ -8,7 +10,7 @@ export type TEOSNetwork = {
   port: number;
 };
 
-export type GetChainInfoResult = {
+export type TGetChainInfoResult = {
   server_version: string;
   chain_id: string;
   head_block_num: number;
@@ -25,6 +27,19 @@ export type GetChainInfoResult = {
   fork_db_head_block_num: number;
   fork_db_head_block_id: string;
 };
+
+export type NetworkName = `mainnet` | `jungle` | `kylin` | `wax`; // DfuseClientOptions["network"] | `wax`
+export function isNetworkName(networkName: string): networkName is NetworkName {
+  switch (networkName) {
+    case `mainnet`:
+    case `jungle`:
+    case `kylin`:
+    case `wax`:
+      return true;
+    default:
+      return false;
+  }
+}
 
 export type TEosAction<T = any> = {
   account: string;
