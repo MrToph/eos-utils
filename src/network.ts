@@ -40,14 +40,21 @@ const getDefaultHttpEndpoint = (networkName: NetworkName) => {
   }
 };
 
-export const createNetworkRandomEndpoint = (networkName: NetworkName) => {
+type CreateNetworkOptions = {
+  fetch?: any;
+};
+export const createNetworkRandomEndpoint = (
+  networkName: NetworkName,
+  options: CreateNetworkOptions,
+) => {
   const endpoint = getDefaultHttpEndpoint(networkName);
-  return createNetwork(networkName, endpoint);
+  return createNetwork(networkName, endpoint, options);
 };
 
 export const createNetwork = (
   networkName: NetworkName,
   nodeEndpoint: string,
+  options?: CreateNetworkOptions,
 ): TEOSNetwork & { rpc: JsonRpc } => {
   const chainId = getChainIdForNetwork(networkName);
 
@@ -60,7 +67,13 @@ export const createNetwork = (
 
   const [, httpProtocol, host, port] = matches;
 
-  const rpc = new JsonRpc(nodeEndpoint);
+  if (typeof window === `undefined` && (!options || !options.fetch)) {
+    console.warn(
+      `eos-utils::createNetwork: You seem to be running in a node environment but did not pass a fetch polyfill`,
+    );
+  }
+
+  const rpc = new JsonRpc(nodeEndpoint, options);
 
   return {
     networkName,
