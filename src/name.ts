@@ -76,7 +76,7 @@ function convertValueToName(value: Long) {
  * eosjs name (de-)serialization of names is different from the one that EOSIO uses
  * https://github.com/EOSIO/eosjs/blob/849c03992e6ce3cb4b6a11bf18ab17b62136e5c9/src/eosjs-serialize.ts#L340-L363
  */
-function convertValueToName2(symbolRaw: Long) {
+function convertValue2NameSerialized(symbolRaw: Long) {
   const a = symbolRaw.toBytesLE();
   let result = '';
   for (let bit = 63; bit >= 0; ) {
@@ -101,6 +101,43 @@ function convertValueToName2(symbolRaw: Long) {
   }
 
   return result;
+}
+
+/**
+ * Encodes a value the same way eosjs (de-)serializes names
+ * eosjs name (de-)serialization of names is different from the one that EOSIO uses
+ * https://github.com/EOSIO/eosjs/blob/849c03992e6ce3cb4b6a11bf18ab17b62136e5c9/src/eosjs-serialize.ts#L340-L363
+ */
+function convertName2ValueSerialized(name: string) {
+  if (typeof name !== 'string') {
+    throw new Error('Expected string containing name');
+  }
+  function charToSymbol(c: number) {
+    if (c >= 'a'.charCodeAt(0) && c <= 'z'.charCodeAt(0)) {
+      return c - 'a'.charCodeAt(0) + 6;
+    }
+    if (c >= '1'.charCodeAt(0) && c <= '5'.charCodeAt(0)) {
+      return c - '1'.charCodeAt(0) + 1;
+    }
+    return 0;
+  }
+  const a = new Uint8Array(8);
+  let bit = 63;
+  for (let i = 0; i < name.length; i += 1) {
+    let c = charToSymbol(name.charCodeAt(i));
+    if (bit < 5) {
+      // eslint-disable-next-line no-bitwise
+      c <<= 1;
+    }
+    for (let j = 4; j >= 0; j -= 1) {
+      if (bit >= 0) {
+        // eslint-disable-next-line no-bitwise
+        a[Math.floor(bit / 8)] |= ((c >> j) & 1) << bit % 8;
+        bit -= 1;
+      }
+    }
+  }
+  return Long.fromBytesLE(Array.from(a));
 }
 
 function bytesToHex(bytes: any) {
@@ -139,10 +176,12 @@ function convertName2Value(name: string, littleEndian = false): Long {
   return encodeNameToUint64(name, littleEndian).toUnsigned();
 }
 
-function convertValue2Name(value: Long | number | string, encodeLikeEosJs = false): string {
+function convertValue2Name(
+  value: Long | number | string,
+): string {
   const val = getLong(value);
 
-  return encodeLikeEosJs ? convertValueToName2(val) : convertValueToName(val);
+  return convertValueToName(val);
 }
 
 function getTableBoundsForNameAsValue(name: string) {
@@ -171,6 +210,8 @@ export {
   isName,
   convertName2Value,
   convertValue2Name,
+  convertName2ValueSerialized,
+  convertValue2NameSerialized,
   getTableBoundsForName,
   getTableBoundsForNameAsValue,
 };

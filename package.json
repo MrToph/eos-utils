@@ -10,7 +10,7 @@
     "start": "node ./dist/cli.js",
     "lint": "eslint . --ext '.js,.jsx,.ts,.tsx,.md'",
     "prettier": "prettier -c --write '**/*'",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --forceExit --maxWorkers=10",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -32,9 +32,13 @@
   },
   "homepage": "https://github.com/MrToph/eos-utils#readme",
   "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
     "@types/node": "^12.12.7",
     "@typescript-eslint/eslint-plugin": "^2.7.0",
     "@typescript-eslint/parser": "^2.7.0",
+    "babel-jest": "^25.1.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.5.0",
@@ -42,14 +46,18 @@
     "eslint-plugin-jest": "^23.0.4",
     "eslint-plugin-markdown": "^1.0.1",
     "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^25.1.0",
     "prettier": "^1.19.1",
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.149",
     "@types/long": "^4.0.0",
+    "axios": "^0.19.2",
     "bignumber.js": "^9.0.0",
     "eosio-signing-request": "^1.0.1",
     "eosjs": "^20.0.0",
+    "lodash": "^4.17.15",
     "long": "^4.0.0",
     "zlib": "^1.0.5"
   }
