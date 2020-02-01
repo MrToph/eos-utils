@@ -25,7 +25,8 @@ const eslintrc = {
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": "off",
         "import/extensions": "off",
-        "import/prefer-default-export": "off"
+        "import/prefer-default-export": "off",
+        "no-nested-ternary": "off"
       },
     },
   ],

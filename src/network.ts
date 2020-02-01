@@ -58,15 +58,20 @@ export const createNetwork = (
 ): TEOSNetwork & { rpc: JsonRpc } => {
   const chainId = getChainIdForNetwork(networkName);
 
-  const matches = /^(https?):\/\/(.+):(\d+)\D*$/.exec(nodeEndpoint);
+  const matches = /^(https?):\/\/(.+?)(:\d+){0,1}$/.exec(nodeEndpoint);
   if (!matches) {
     throw new Error(
       `Could not parse EOS HTTP endpoint. Needs protocol and port: "${nodeEndpoint}"`,
     );
   }
 
-  const [, httpProtocol, host, port] = matches;
-
+  const [, httpProtocol, host, portMatch] = matches;
+  const portString = portMatch
+    ? portMatch.replace(/\D/gi, ``)
+    : httpProtocol === `https`
+    ? `443`
+    : `80`;
+  const port = Number.parseInt(portString, 10);
   if (typeof window === `undefined` && (!options || !options.fetch)) {
     console.warn(
       `eos-utils::createNetwork: You seem to be running in a node environment but did not pass a fetch polyfill`,
@@ -80,7 +85,7 @@ export const createNetwork = (
     chainId,
     protocol: httpProtocol,
     host,
-    port: Number.parseInt(port, 10),
+    port,
     nodeEndpoint,
     rpc,
   };
