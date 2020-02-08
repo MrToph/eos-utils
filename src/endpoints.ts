@@ -156,19 +156,22 @@ type TEndpointCheck = {
   endpoint: string;
   latency: number;
 };
-async function check(endpoint: string): Promise<TEndpointCheck> {
+async function check(endpoint: string, options: getApiEndpointsOptions): Promise<TEndpointCheck> {
   const startTime = Date.now();
 
   const response = await post(`${endpoint}/v1/chain/get_info`, {});
   if (response.chain_id !== EOS_CHAIN_ID) throw new Error(`Invalid chain_id`);
 
   const timeDiff = new Date().getTime() - new Date(`${response.head_block_time}Z`).getTime();
-  if (timeDiff > 60 * 1000)
-    throw new Error(`API too far behind head: ${response.head_block_time} (${timeDiff}ms)`);
+  if (timeDiff > options.maxMsBehindHead) {
+    throw new Error(
+      `API too far behind head ${endpoint}: ${response.head_block_time} (${timeDiff}ms)`,
+    );
+  }
 
   try {
     await post(`${endpoint}/v1/chain/push_transaction`, {});
-    throw new Error(`should npt be accepted`);
+    throw new Error(`should not be accepted`);
   } catch (transactionError) {
     const eosErrorWhat = get(transactionError, `response.data.error.what`);
 
@@ -186,22 +189,26 @@ async function check(endpoint: string): Promise<TEndpointCheck> {
   };
 }
 
-async function validateBpEndpoints(producer: ProducerInfo) {
+async function validateBpEndpoints(producer: ProducerInfo, options: getApiEndpointsOptions) {
   const endpoints = await getBpApiEndpoints(producer.url);
   const validEndpoints = await PromiseAllSettledFilterFulfilled(
-    endpoints.map(apiEndpoint => check(apiEndpoint)),
+    endpoints.map(apiEndpoint => check(apiEndpoint, options)),
   );
 
   return validEndpoints;
 }
 
-async function validateBpEndpointsTimed(producers: ProducerInfo[], timeout = 15000) {
+async function validateBpEndpointsTimed(
+  producers: ProducerInfo[],
+  options: getApiEndpointsOptions,
+) {
   const endpointsPerBp = await PromiseAllSettledFilterFulfilled<TEndpointCheck[]>(
     producers.map(
       producer =>
-        Promise.race([validateBpEndpoints(producer), sleep(timeout, true)]) as ReturnType<
-          typeof validateBpEndpoints
-        >,
+        Promise.race([
+          validateBpEndpoints(producer, options),
+          sleep(options.timeoutMs, true),
+        ]) as ReturnType<typeof validateBpEndpoints>,
     ),
   );
 
@@ -211,6 +218,7 @@ async function validateBpEndpointsTimed(producers: ProducerInfo[], timeout = 150
 type getApiEndpointsOptions = {
   timeoutMs: number;
   maxLatencyMs: number;
+  maxMsBehindHead: number;
   topXBpsToCheck: number;
 };
 /**
@@ -225,9 +233,16 @@ export async function getApiEndpoints(
   if (networkName !== `mainnet`)
     throw new Error(`getApiEndpoints: Network ${networkName} not supported yet.`);
 
-  const producers = await getProducers(options.topXBpsToCheck);
+  const mergedOptions = {
+    timeoutMs: 15 * 1000,
+    maxLatencyMs: 5 * 1000,
+    maxMsBehindHead: 1 * 1000,
+    topXBpsToCheck: 80,
+    ...options,
+  };
+  const producers = await getProducers(mergedOptions.topXBpsToCheck);
 
-  let validEndpoints = await validateBpEndpointsTimed(producers, options.timeoutMs);
+  let validEndpoints = await validateBpEndpointsTimed(producers, mergedOptions);
 
   validEndpoints = validEndpoints.sort((x, y) => x.latency - y.latency);
   if (typeof options.maxLatencyMs === `number`) {
