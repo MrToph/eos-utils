@@ -1,9 +1,6 @@
 import Long from 'long';
-import { TextEncoder, TextDecoder } from 'util';
+import { encode, decode } from 'isomorphic-textencoder';
 import { convertValue2NameSerialized, convertName2ValueSerialized } from './name';
-
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
 
 // https://github.com/EOSIO/eosjs/blob/master/src/eosjs-serialize.ts#L386-L420
 export const convertSymbolCode2Raw = (symbolCode: string): Long => {
@@ -11,7 +8,7 @@ export const convertSymbolCode2Raw = (symbolCode: string): Long => {
     throw new Error('Expected string containing symbol_code');
   }
   const a = [];
-  a.push(...textEncoder.encode(symbolCode));
+  a.push(...encode(symbolCode));
   while (a.length < 8) {
     a.push(0);
   }
@@ -27,7 +24,7 @@ export const convertRaw2SymbolCode = (value: Long): string => {
   if (stringTerminationIndex >= 0) {
     bytes = bytes.slice(0, stringTerminationIndex);
   }
-  const name = textDecoder.decode(new Uint8Array(bytes));
+  const name = decode(new Uint8Array(bytes));
   return name;
 };
 

@@ -57,6 +57,7 @@
     "bignumber.js": "^9.0.0",
     "eosio-signing-request": "^1.0.1",
     "eosjs": "^20.0.0",
+    "isomorphic-textencoder": "^1.0.1",
     "lodash": "^4.17.15",
     "long": "^4.0.0",
     "zlib": "^1.0.5"
