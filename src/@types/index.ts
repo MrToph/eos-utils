@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { defaultCipherList } from 'constants';
 
 export type TEOSNetwork = {
   networkName: NetworkName;
@@ -68,7 +67,7 @@ export type TTransactionResult = {
 
 // mimicks EOS C++ smart contract asset and symbol class
 export type TAssetSymbol = {
-  symbolCode: string;
+  code: string;
   precision: number;
 };
 

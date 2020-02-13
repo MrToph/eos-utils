@@ -1,5 +1,7 @@
 import { JsonRpc } from 'eosjs';
-import { TEOSNetwork, NetworkName } from './types';
+// @ts-ignore
+import fetch from 'isomorphic-fetch';
+import { TEOSNetwork, NetworkName } from './@types';
 
 export const getChainIdForNetwork = (networkName: NetworkName) => {
   switch (networkName) {
@@ -54,9 +56,14 @@ export const createNetworkRandomEndpoint = (
 export const createNetwork = (
   networkName: NetworkName,
   nodeEndpoint: string,
-  options?: CreateNetworkOptions,
+  options: CreateNetworkOptions = {},
 ): TEOSNetwork & { rpc: JsonRpc } => {
   const chainId = getChainIdForNetwork(networkName);
+
+  const mergedOptions = {
+    fetch,
+    ...options,
+  };
 
   const matches = /^(https?):\/\/(.+?)(:\d+){0,1}$/.exec(nodeEndpoint);
   if (!matches) {
@@ -72,13 +79,8 @@ export const createNetwork = (
     ? `443`
     : `80`;
   const port = Number.parseInt(portString, 10);
-  if (typeof window === `undefined` && (!options || !options.fetch)) {
-    console.warn(
-      `eos-utils::createNetwork: You seem to be running in a node environment but did not pass a fetch polyfill`,
-    );
-  }
 
-  const rpc = new JsonRpc(nodeEndpoint, options);
+  const rpc = new JsonRpc(nodeEndpoint, mergedOptions);
 
   return {
     networkName,

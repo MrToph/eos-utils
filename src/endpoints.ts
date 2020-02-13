@@ -8,8 +8,8 @@ import https from 'https';
 import flatten from 'lodash/flatten';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
-import { NetworkName } from './types';
-import { PromiseAllSettledFilterFulfilled, sleep } from './promise-utils';
+import { NetworkName } from './@types';
+import { PromiseAllSettledFilterFulfilled, sleep } from './utils/promise';
 import { getChainIdForNetwork } from './network';
 
 interface ProducerInfo {

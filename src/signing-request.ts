@@ -3,15 +3,13 @@ import zlib from 'zlib';
 import { JsonRpc, Api } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { SigningRequest } from 'eosio-signing-request';
-import { TEosAction } from './types';
-
-const textEncoder = new util.TextEncoder();
-const textDecoder = new util.TextDecoder();
+import { TEosAction } from './@types';
+import { textEncoder, textDecoder } from './utils/poly-fill';
 
 export const createSigningRequest = async (actions: TEosAction[], rpc: JsonRpc) => {
   const eos = new Api({
     rpc,
-    textDecoder: textDecoder as any,
+    textDecoder,
     textEncoder,
     signatureProvider: new JsSignatureProvider([]),
   });
