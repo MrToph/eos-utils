@@ -28,6 +28,10 @@ export function formatAsset(
 
   // amount is supposed to be an uint64, so cut off any decimals
   let s = (amount instanceof BigNumber ? amount.toString() : String(amount)).split(`.`)[0];
+  const sign = /-/i.test(s) ? -1 : 1;
+  if (sign === -1) {
+    s = s.replace(/-/gi, ``);
+  }
   while (s.length < precision + 1) {
     s = `0${s}`;
   }
@@ -43,6 +47,8 @@ export function formatAsset(
 
   let result = `${pre}.${decimals}`;
   if (options.withSymbol) result = `${result} ${code}`;
+
+  if (sign === -1) result = `-${result}`;
   return result;
 }
 
