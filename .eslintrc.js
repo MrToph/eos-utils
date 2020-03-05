@@ -26,7 +26,10 @@ const eslintrc = {
         "@typescript-eslint/no-unused-vars": "off",
         "import/extensions": "off",
         "import/prefer-default-export": "off",
-        "no-nested-ternary": "off"
+        "no-nested-ternary": "off",
+        "no-param-reassign": "off",
+        "no-continue": "off",
+        "class-methods-use-this": "off"
       },
     },
   ],
