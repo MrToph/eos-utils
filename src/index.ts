@@ -6,4 +6,5 @@ export * from './endpoints';
 export * from './format';
 export * from './asset';
 export * from './dfuse';
+export * from './fetch';
 export * from './@types/index';
