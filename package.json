@@ -1,6 +1,6 @@
 {
   "name": "@deltalabs/eos-utils",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Various utility functions for EOS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
