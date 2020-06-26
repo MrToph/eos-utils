@@ -1,12 +1,13 @@
+import Long from 'long';
 import {
   convertSymbolCode2Name,
   convertName2SymbolCode,
   convertSymbolCode2Raw,
   convertRaw2SymbolCode,
 } from '../src/symbol';
-import { convertValue2Name } from '../src/name';
+import { convertValue2Name, convertValue2NameSerialized } from '../src/name';
 
-describe(`convert`, () => {
+describe(`symbols`, () => {
   it(`can convert symbols`, () => {
     const encodedSymbol = convertSymbolCode2Name(`EOS`);
     expect(encodedSymbol).toBe(`........ehbo5`);
@@ -29,5 +30,22 @@ describe(`convert`, () => {
     const reconvertedSymbol = convertName2SymbolCode(encodedSymbol);
     const raw = convertSymbolCode2Raw(reconvertedSymbol).toString(10);
     expect(raw).toBe(`356`);
+  });
+});
+
+describe(`names`, () => {
+  it(`can convert names`, () => {
+    const encodedName = convertValue2NameSerialized(Long.fromString(`6138663577826885632`));
+    expect(encodedName).toBe(`eosio`);
+  });
+
+  it(`can convert names 2`, () => {
+    const encodedName = convertValue2NameSerialized(Long.fromString(`-6569208335818555392`));
+    expect(encodedName).toBe(`onerror`);
+  });
+
+  it(`can convert names 3`, () => {
+    const encodedName = convertValue2NameSerialized(Long.fromString(`-3617168760277827584`));
+    expect(encodedName).toBe(`transfer`);
   });
 });
