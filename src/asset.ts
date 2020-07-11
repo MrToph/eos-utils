@@ -83,3 +83,15 @@ export function decomposeAsset(assetString: string): TAsset {
     );
   }
 }
+
+export const asset2dec = (quantity: TAsset): number => {
+  return quantity.amount.div(new BigNumber(`10`).pow(quantity.symbol.precision)).toNumber();
+};
+
+export const dec2asset = (val: number, symbol: TAssetSymbol): TAsset => {
+  const amount = new BigNumber(val).times(new BigNumber(`10`).pow(symbol.precision));
+  return {
+    amount,
+    symbol,
+  };
+};

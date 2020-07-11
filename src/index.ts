@@ -8,3 +8,6 @@ export * from './asset';
 export * from './dfuse';
 export * from './fetch';
 export * from './@types/index';
+
+// report eosjs
+export * from 'eosjs';
