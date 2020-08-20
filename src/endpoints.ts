@@ -98,7 +98,6 @@ async function post(url: string, data: { [key: string]: any }, timeoutMs = 60000
   });
   if (
     response.status !== 200 ||
-    response.statusText !== 'OK' ||
     !(response.headers['content-type'] as string).startsWith('application/json')
   ) {
     throw new Error('Malformed response');
