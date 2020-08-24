@@ -47,7 +47,7 @@ interface BpJson {
   nodes: BpNode[];
 }
 
-const EOS_CHAIN_ID = getChainIdForNetwork(`mainnet`);
+const EOS_CHAIN_ID = getChainIdForNetwork(`eos`);
 
 const BP_SEEDS = [
   'https://mainnet.eoscanada.com',
@@ -229,7 +229,7 @@ export async function getApiEndpoints(
   networkName: NetworkName,
   options: Partial<getApiEndpointsOptions> = {},
 ): Promise<TEndpointCheck[]> {
-  if (networkName !== `mainnet`)
+  if (networkName !== `eos`)
     throw new Error(`getApiEndpoints: Network ${networkName} not supported yet.`);
 
   const mergedOptions = {

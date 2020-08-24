@@ -5,7 +5,7 @@ import { TEOSNetwork, NetworkName, isNetworkName } from './@types';
 
 export const getChainIdForNetwork = (networkName: NetworkName) => {
   switch (networkName) {
-    case `mainnet`: {
+    case `eos`: {
       return `aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906`;
     }
     case `kylin`: {
@@ -25,7 +25,7 @@ export const getChainIdForNetwork = (networkName: NetworkName) => {
 // TODO: use something like eos-endpoints to always get a low latency once
 const getDefaultHttpEndpoint = (networkName: NetworkName) => {
   switch (networkName) {
-    case `mainnet`: {
+    case `eos`: {
       return `https://eos.greymass.com:443`;
     }
     case `kylin`: {
@@ -36,6 +36,9 @@ const getDefaultHttpEndpoint = (networkName: NetworkName) => {
     }
     case `wax`: {
       return `https://chain.wax.io:443`;
+    }
+    case `waxtest`: {
+      return `https://waxtestnet.greymass.com:443`;
     }
     default:
       throw new Error(`Unknown network "${networkName}"`);
@@ -59,7 +62,9 @@ export const createNetwork = (
   options: CreateNetworkOptions = {},
 ): TEOSNetwork & { rpc: JsonRpc } => {
   let chainId = networkNameOrChainId;
+  let networkName: NetworkName | undefined;
   if (isNetworkName(networkNameOrChainId)) {
+    networkName = networkNameOrChainId;
     chainId = getChainIdForNetwork(networkNameOrChainId);
   }
 

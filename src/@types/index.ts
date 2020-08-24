@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 
 export type TEOSNetwork = {
-  networkName: NetworkName;
+  networkName?: NetworkName;
   chainId: string;
   nodeEndpoint: string;
   protocol: string;
