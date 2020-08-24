@@ -28,7 +28,7 @@ describe(`networks`, () => {
     expect.assertions(TEST_CASES.length);
 
     TEST_CASES.forEach((endpoint, index) => {
-      const network = createNetwork(`mainnet`, endpoint);
+      const network = createNetwork(`eos`, endpoint);
 
       expect(network).toMatchObject(TEST_CASES_EXPECTATIONS[index]);
     });

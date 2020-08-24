@@ -27,10 +27,10 @@ export type TGetChainInfoResult = {
   fork_db_head_block_id: string;
 };
 
-export type NetworkName = `mainnet` | `jungle` | `kylin` | `wax`; // DfuseClientOptions["network"] | `wax`
+export type NetworkName = `eos` | `jungle` | `kylin` | `wax` | `waxtest`; // DfuseClientOptions["network"] | `wax`
 export function isNetworkName(networkName: string): networkName is NetworkName {
   switch (networkName) {
-    case `mainnet`:
+    case `eos`:
     case `jungle`:
     case `kylin`:
     case `wax`:

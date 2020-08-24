@@ -1,7 +1,7 @@
 import { JsonRpc } from 'eosjs';
 // @ts-ignore
 import fetch from 'isomorphic-fetch';
-import { TEOSNetwork, NetworkName } from './@types';
+import { TEOSNetwork, NetworkName, isNetworkName } from './@types';
 
 export const getChainIdForNetwork = (networkName: NetworkName) => {
   switch (networkName) {
@@ -54,11 +54,14 @@ export const createNetworkRandomEndpoint = (
 };
 
 export const createNetwork = (
-  networkName: NetworkName,
+  networkNameOrChainId: NetworkName | string,
   nodeEndpoint: string,
   options: CreateNetworkOptions = {},
 ): TEOSNetwork & { rpc: JsonRpc } => {
-  const chainId = getChainIdForNetwork(networkName);
+  let chainId = networkNameOrChainId;
+  if (isNetworkName(networkNameOrChainId)) {
+    chainId = getChainIdForNetwork(networkNameOrChainId);
+  }
 
   const mergedOptions = {
     fetch,
