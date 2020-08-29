@@ -10,7 +10,7 @@ jest.setTimeout(2 * TIMEOUT);
 describe(`endpoints`, () => {
   it(`fetches them sorted by latency`, async () => {
     expect.assertions(2);
-    const endpoints = await getApiEndpoints(`mainnet`, {
+    const endpoints = await getApiEndpoints(`eos`, {
       timeoutMs: TIMEOUT,
       maxLatencyMs: 5000,
       topXBpsToCheck: 21,

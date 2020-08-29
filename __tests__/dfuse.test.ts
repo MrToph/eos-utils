@@ -4,7 +4,7 @@ import { DfuseSearcher } from '../src/dfuse';
 
 const client = createDfuseClient({
   apiKey: process.env.DFUSE_API_KEY,
-  network: `mainnet`,
+  network: `eos`,
   httpClientOptions: {
     fetch,
   },

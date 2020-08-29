@@ -12,7 +12,7 @@ describe(`time`, () => {
   // });
 
   // xit(`can convert blockNumbers to Dates`, async () => {
-  //   const { rpc } = createNetworkRandomEndpoint(`mainnet`, { fetch: nodeFetch });
+  //   const { rpc } = createNetworkRandomEndpoint(`eos`, { fetch: nodeFetch });
   //   expect.assertions(1);
   //   const date = await blockNumberToDate(rpc)(1);
   //   expect(date.toISOString()).toBe(`2018-06-08T08:08:08.500Z`);

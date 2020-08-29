@@ -12,7 +12,7 @@ describe(`createSigningRequest`, () => {
   it(`creates a signing request`, async () => {
     expect.assertions(1);
 
-    const network = createNetworkRandomEndpoint(`mainnet`);
+    const network = createNetworkRandomEndpoint(`eos`);
 
     const action = {
       account: `eosio.token`,
