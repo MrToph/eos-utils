@@ -76,8 +76,9 @@ function convertValueToName(value: Long) {
  * eosjs name (de-)serialization of names is different from the one that EOSIO uses
  * https://github.com/EOSIO/eosjs/blob/849c03992e6ce3cb4b6a11bf18ab17b62136e5c9/src/eosjs-serialize.ts#L340-L363
  */
-function convertValue2NameSerialized(symbolRaw: Long) {
-  const a = symbolRaw.toBytesLE();
+function convertValue2NameSerialized(value: Long | number | string): string {
+  const val = getLong(value);
+  const a = val.toBytesLE();
   let result = '';
   for (let bit = 63; bit >= 0; ) {
     let c = 0;
@@ -176,9 +177,7 @@ function convertName2Value(name: string, littleEndian = false): Long {
   return encodeNameToUint64(name, littleEndian).toUnsigned();
 }
 
-function convertValue2Name(
-  value: Long | number | string,
-): string {
+function convertValue2Name(value: Long | number | string): string {
   const val = getLong(value);
 
   return convertValueToName(val);
