@@ -6,7 +6,11 @@ import { SigningRequest } from 'eosio-signing-request';
 import { TEosAction } from './@types';
 import { textEncoder, textDecoder } from './utils/poly-fill';
 
-export const createSigningRequest = async (actions: TEosAction[], rpc: JsonRpc) => {
+export const createSigningRequest = async (
+  actions: TEosAction[],
+  rpc: JsonRpc,
+  options: Parameters<typeof SigningRequest['create']>[1] = {},
+) => {
   const eos = new Api({
     rpc,
     textDecoder,
@@ -29,6 +33,7 @@ export const createSigningRequest = async (actions: TEosAction[], rpc: JsonRpc) 
     abiProvider: {
       getAbi: async (account: string) => eos.getAbi(account),
     },
+    ...options,
   };
 
   const request = await SigningRequest.create({ actions }, opts);
