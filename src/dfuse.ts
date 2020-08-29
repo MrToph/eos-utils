@@ -53,7 +53,7 @@ export class DfuseSearcher {
     actionTraceMatcher: TActionTraceMatcher,
     options: {
       toBlock?: number;
-      limit: number;
+      limit?: number;
     },
   ) {
     const mergedOptions = {
