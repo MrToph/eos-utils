@@ -2,20 +2,24 @@ import { createDfuseClient, OnDiskApiTokenStore } from '@dfuse/client';
 import fetch from 'isomorphic-fetch';
 import { DfuseSearcher } from '../src/dfuse';
 
+if (!process.env.DFUSE_API_KEY) {
+  throw new Error(`No 'DFUSE_API_KEY' env var`);
+}
+
 const client = createDfuseClient({
   apiKey: process.env.DFUSE_API_KEY,
-  network: `eos`,
+  network: `mainnet`,
   httpClientOptions: {
     fetch,
   },
   streamClientOptions: {
     socketOptions: {
-      webSocketFactory: async () => null,
+      webSocketFactory: (async () => null) as any,
     },
   } as any,
   graphqlStreamClientOptions: {
     socketOptions: {
-      webSocketFactory: async () => null,
+      webSocketFactory: (async () => null) as any,
     },
   },
   apiTokenStore: new OnDiskApiTokenStore(process.env.DFUSE_API_KEY),
@@ -30,7 +34,7 @@ describe(`dfuse searcher`, () => {
 
     const searcher = new DfuseSearcher({ client });
 
-    const actionTraceMatcher = trace => {
+    const actionTraceMatcher = (trace: any) => {
       if (trace.receipt.receiver !== `b1`) return false;
 
       return (
