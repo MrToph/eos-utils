@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { TAsset, TAssetSymbol } from './@types';
+import { TAsset, TAssetSymbol, TExtendedAsset, TExtendedSymbol } from './@types';
 import { separateThousands } from './utils/format';
 
 type FormatOptions = {
@@ -95,3 +95,39 @@ export const dec2asset = (val: number, symbol: TAssetSymbol): TAsset => {
     symbol,
   };
 };
+
+export const asset2extAsset = (asset: TAsset, contract: string): TExtendedAsset => {
+  return {
+    amount: asset.amount,
+    extSymbol: {
+      symbol: asset.symbol,
+      contract,
+    },
+  };
+};
+export const extAsset2asset = (extAsset: TExtendedAsset): TAsset => {
+  return {
+    amount: extAsset.amount,
+    symbol: extAsset.extSymbol.symbol,
+  };
+};
+
+export const dec2extAsset = (val: number, extSymbol: TExtendedSymbol): TExtendedAsset => {
+  return asset2extAsset(dec2asset(val, extSymbol.symbol), extSymbol.contract);
+};
+
+export const extAsset2dec = (extAsset: TExtendedAsset): number => {
+  return asset2dec(extAsset2asset(extAsset));
+};
+
+// useless converters
+// export const symbol2extSymbol = (symbol: TAssetSymbol, contract: string): TExtendedSymbol => {
+//   return {
+//     symbol,
+//     contract,
+//   };
+// };
+
+// export const extSymbol2symbol = (extAsset: TExtendedSymbol): TAssetSymbol => {
+//   return extAsset.symbol;
+// };
