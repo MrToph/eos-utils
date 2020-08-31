@@ -75,3 +75,13 @@ export type TAsset = {
   amount: BigNumber;
   symbol: TAssetSymbol;
 };
+
+export type TExtendedSymbol = {
+  symbol: TAssetSymbol;
+  contract: string;
+};
+
+export type TExtendedAsset = {
+  amount: BigNumber;
+  extSymbol: TExtendedSymbol;
+};
