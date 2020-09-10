@@ -1,12 +1,7 @@
 // Originally from https://raw.githubusercontent.com/EOSIO/eosjs/v16.0.9/src/format.js
 // eosjs2 does not have this function
 import Long from 'long';
-
-function getLong(value: Long | number | string) {
-  if (typeof value === `string`) return Long.fromString(value);
-  if (typeof value === `number`) return Long.fromNumber(value);
-  return value;
-}
+import { getLong } from './utils/serialize';
 
 function isName(str: string) {
   try {
