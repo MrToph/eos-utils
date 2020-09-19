@@ -1,4 +1,4 @@
-import { formatAsset } from '../src/asset';
+import { decomposeAsset, formatAsset } from '../src/asset';
 
 const symbol = { code: `EOS`, precision: 4 };
 
@@ -15,6 +15,17 @@ describe(`asset`, () => {
       { withSymbol: false, separateThousands: true },
     );
     expect(fmt).toBe(`1,000.0000`);
+  });
+  it(`can decompose asset with 0 precision`, () => {
+    let assetString = `10 AAAA`;
+
+    const asset = decomposeAsset(assetString);
+    expect(asset.amount.toString()).toBe(`10`);
+    expect(asset.symbol.code).toBe(`AAAA`);
+    expect(asset.symbol.precision).toBe(0);
+
+    let fmt = formatAsset(asset);
+    expect(fmt).toBe(`10 AAAA`);
   });
 
   it(`can format negative asset`, () => {

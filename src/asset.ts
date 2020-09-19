@@ -36,8 +36,8 @@ export function formatAsset(
     s = `0${s}`;
   }
 
-  let pre = s.slice(0, -precision);
-  const decimals = s.slice(-precision);
+  let pre = s.slice(0, precision === 0 ? undefined : -precision);
+  const decimals = precision === 0 ? `` : s.slice(-precision);
 
   if (options.separateThousands) {
     // adds `,` thousand separators
@@ -45,7 +45,8 @@ export function formatAsset(
     pre = separateThousands(pre);
   }
 
-  let result = `${pre}.${decimals}`;
+  let result = pre;
+  if (decimals) result = `${result}.${decimals}`;
   if (options.withSymbol) result = `${result} ${code}`;
 
   if (sign === -1) result = `-${result}`;
@@ -62,13 +63,14 @@ export function decomposeAsset(assetString: string): TAsset {
     if (!amountWithPrecision || !symbolName) {
       throw new Error(`Invalid split`);
     }
-    const amountNoPrecision = new BigNumber(amountWithPrecision.replace(`.`, ``), 10);
 
     const dotIndex = amountWithPrecision.indexOf(`.`);
-    if (dotIndex === -1) {
-      throw new Error(`No dot found`);
+    let precision = 0;
+    if (dotIndex !== -1) {
+      precision = amountWithPrecision.length - dotIndex - 1;
     }
-    const precision = amountWithPrecision.length - dotIndex - 1;
+
+    const amountNoPrecision = new BigNumber(amountWithPrecision.replace(`.`, ``), 10);
 
     return {
       amount: amountNoPrecision,
