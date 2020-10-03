@@ -1,6 +1,28 @@
+import flatten from 'lodash/flatten';
 import { ActionTrace, DfuseClient, SearchTransactionRow } from '@dfuse/client';
+import { TEosAction } from './@types';
 import { TActionInfo, TActionTraceMatcher } from './@types/dfuse';
 
+type DfuseSearchTransactionTrace<T = any> = {
+  block: {
+    num: string;
+    id: string;
+    timestamp: string;
+  };
+  id: string;
+  matchingActions: {
+    account: string;
+    name: string;
+    json: T;
+    seq: string;
+    receiver: string;
+    console: string;
+    authorization: {
+      actor: string;
+      permission: string;
+    }[];
+  }[];
+};
 export class DfuseSearcher {
   private client: DfuseClient;
 
@@ -8,58 +30,75 @@ export class DfuseSearcher {
     this.client = client;
   }
 
-  public getActionTraces(
-    tx: SearchTransactionRow,
+  public filterActionTraces(
+    actions: TActionInfo[],
     isMatchingTrace: TActionTraceMatcher,
   ): TActionInfo[] {
-    const matchingTraces = [] as ActionTrace<any>[];
+    return actions.filter(isMatchingTrace);
+  }
 
-    // BFS through transaction traces
-    const traces = tx.lifecycle.execution_trace!.action_traces;
-    while (traces.length > 0) {
-      const curTrace = traces.shift()!;
+  private buildGraphQLSearchString(
+    searchQuery: string,
+    options: {
+      lowBlock?: number;
+      highBlock?: number;
+      limit: number;
+      backward: boolean;
+    },
+    cursor: string,
+  ) {
+    let query = `query {
+      ${
+        options.backward ? `searchTransactionsBackward` : `searchTransactionsForward`
+      }(query: "${searchQuery}"`;
+    if (options.lowBlock) query += `, lowBlockNum: ${options.lowBlock}`;
+    if (options.highBlock) query += `, highBlockNum: ${options.highBlock}`;
 
-      if (isMatchingTrace(curTrace)) {
-        matchingTraces.push(curTrace);
+    query += `, limit: ${options.limit}`;
+    query += `, cursor: "${cursor}") {
+        results {
+          cursor
+          trace {
+            block {
+              num
+              id
+              timestamp
+            }
+            id
+            matchingActions {
+              account
+              name
+              json
+              seq
+              receiver
+              console
+              authorization {
+                actor
+                permission
+              }
+            }
+          }
+        }
       }
-
-      if (Array.isArray(curTrace.inline_traces)) {
-        traces.push(...curTrace.inline_traces);
-      }
-    }
-
-    return matchingTraces.map(trace => {
-      return {
-        blockNumber: trace.block_num,
-        timestamp: new Date(`${trace.block_time}Z`),
-        account: trace.act.account,
-        name: trace.act.name,
-        data: trace.act.data,
-        print: trace.console,
-        trxId: trace.trx_id,
-        // https://github.com/EOSIO/eos/blob/master/libraries/chain/apply_context.cpp#L127
-        // global_sequence unique per non-failed transactions
-        globalSequence: Number.parseInt(String(trace.receipt.global_sequence), 10),
-        // recv_sequence unique per contract, is a counter incremeted each time account is a receiver
-        receiveSequence: Number.parseInt(String(trace.receipt.recv_sequence), 10),
-        // not necessarily unique as it just hashes the action data?
-        actDigest: trace.receipt.act_digest,
-      };
-    });
+    }`;
+    return query;
   }
 
   public async *searchTransactions<T = any>(
     searchQuery: string,
     actionTraceMatcher: TActionTraceMatcher,
     options: {
-      toBlock?: number;
+      fromBlockIncluding?: number;
+      toBlockIncluding?: number;
       limit?: number;
+      backward?: boolean;
     },
   ) {
     const mergedOptions = {
-      toBlock: undefined,
-      limit: 100,
-      ...options,
+      highBlock: options.toBlockIncluding || undefined,
+      lowBlock: options.fromBlockIncluding || undefined,
+      limit: options.limit || 100,
+      backward: options.backward || false,
     };
     let response: any;
     let cursor = ``;
@@ -74,12 +113,7 @@ export class DfuseSearcher {
               rej(new Error(`searchTransactions took too long.`));
             }, 20 * 1e3);
           }),
-          this.client.searchTransactions(searchQuery, {
-            limit: mergedOptions.limit,
-            sort: `desc`,
-            cursor,
-            startBlock: mergedOptions.toBlock,
-          }),
+          this.client.graphql(this.buildGraphQLSearchString(searchQuery, mergedOptions, cursor)),
         ]);
       } catch (error) {
         let { message } = error;
@@ -90,18 +124,39 @@ export class DfuseSearcher {
         // try again
         continue;
       }
+      if (response.errors)
+        throw new Error(response.errors.map((error: Error) => error.message).join(`\n`));
 
-      cursor = response.cursor;
+      const { results } = response.data[
+        options.backward ? `searchTransactionsBackward` : `searchTransactionsForward`
+      ];
+      cursor = results.length > 0 ? results[results.length - 1].cursor : ``;
+      const traces: DfuseSearchTransactionTrace<T>[] = results.map((obj: any) => obj.trace);
 
-      const newTransactions = response.transactions;
-      if (newTransactions && newTransactions[0]) {
-        const newActions = [] as TActionInfo<T>[];
-        newTransactions.forEach((trans: any) => {
-          const actions = this.getActionTraces(trans, actionTraceMatcher);
-          newActions.push(...actions);
-        });
-        yield newActions;
-      }
+      const newActions: TActionInfo<T>[] = flatten(
+        traces.map(trace => {
+          const blockNumber = Number.parseInt(trace.block.num, 10);
+          const timestamp = new Date(trace.block.timestamp);
+          const txId = new Date(trace.id);
+
+          return trace.matchingActions.map(actionTrace => {
+            return {
+              blockNumber,
+              timestamp,
+              account: actionTrace.account,
+              name: actionTrace.name,
+              receiver: actionTrace.receiver,
+              data: actionTrace.json,
+              console: actionTrace.console,
+              txId,
+              globalSequence: actionTrace.seq,
+              authorization: actionTrace.authorization,
+            };
+          });
+        }),
+      ) as any;
+      const actions = this.filterActionTraces(newActions, actionTraceMatcher);
+      yield actions;
     } while (cursor !== ``);
   }
 }

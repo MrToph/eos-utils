@@ -2,13 +2,17 @@ import { createDfuseClient, OnDiskApiTokenStore } from '@dfuse/client';
 import fetch from 'isomorphic-fetch';
 import { DfuseSearcher } from '../src/dfuse';
 
-if (!process.env.DFUSE_API_KEY) {
-  throw new Error(`No 'DFUSE_API_KEY' env var`);
-}
+type TransferPayload = {
+  from: string;
+  to: string;
+  quantity: string;
+  memo: string;
+};
 
 const client = createDfuseClient({
-  apiKey: process.env.DFUSE_API_KEY,
-  network: `mainnet`,
+  // DFUSE community edition
+  authentication: false,
+  network: `eos.dfuse.eosnation.io`,
   httpClientOptions: {
     fetch,
   },
@@ -22,7 +26,6 @@ const client = createDfuseClient({
       webSocketFactory: (async () => null) as any,
     },
   },
-  apiTokenStore: new OnDiskApiTokenStore(process.env.DFUSE_API_KEY),
 });
 
 const TIMEOUT = 15000;
@@ -30,26 +33,55 @@ jest.setTimeout(2 * TIMEOUT);
 
 describe(`dfuse searcher`, () => {
   it(`fetches transfers of b1`, async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     const searcher = new DfuseSearcher({ client });
 
-    const actionTraceMatcher = (trace: any) => {
-      if (trace.receipt.receiver !== `b1`) return false;
+    const actionTraceMatcher: Parameters<typeof searcher['searchTransactions']>[1] = trace => {
+      if (trace.receiver !== `b1`) return false;
 
       return (
-        trace.act.account === `eosio.token` &&
-        trace.act.name === `transfer` &&
-        (trace.act.data.from === `b1` || trace.act.data.to === `b1`)
+        trace.account === `eosio.token` &&
+        trace.name === `transfer` &&
+        (trace.data.from === `b1` || trace.data.to === `b1`)
       );
     };
 
     const searchString = `receiver:b1 account:eosio.token action:transfer`;
-    const actions = [];
-    for await (const traces of searcher.searchTransactions(searchString, actionTraceMatcher, {
+    for await (const traces of searcher.searchTransactions<TransferPayload>(
+      searchString,
+      actionTraceMatcher,
+      {
+        limit: 1,
+        backward: false,
+      },
+    )) {
+      expect(traces.length).toBe(1);
+      expect(traces[0].data.memo).toBe(
+        `Never doubt that a small group of thoughtful, committed citizens can change the world; indeed, it's the only thing that ever has - eosacknowledgments.io`,
+      );
+      break;
+    }
+  });
+
+  it(`fetches backward`, async () => {
+    expect.assertions(2);
+
+    const searcher = new DfuseSearcher({ client });
+
+    const actionTraceMatcher: Parameters<typeof searcher['searchTransactions']>[1] = trace => {
+      return true;
+    };
+
+    const searchString = `account:mooncakepool action:harvest`;
+    for await (const traces of searcher.searchTransactions<any>(searchString, actionTraceMatcher, {
       limit: 1,
+      backward: true,
     })) {
-      expect(traces[0].data.to).toBe(`b1`);
+      expect(traces.length).toBe(1);
+      expect(traces[0].timestamp.getTime() > new Date(`2020-10-01T00:00:00.000Z`).getTime()).toBe(
+        true,
+      );
       break;
     }
   });

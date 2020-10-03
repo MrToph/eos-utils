@@ -1,16 +1,17 @@
-import { ActionTrace } from '@dfuse/client';
-
-export type TActionTraceMatcher<T = any> = (actionTrace: ActionTrace<T>) => boolean;
+export type TActionTraceMatcher<T = any> = (actionTrace: TActionInfo<T>) => boolean;
 
 export type TActionInfo<T = any> = {
   blockNumber: number;
   timestamp: Date;
   account: string;
+  receiver: string;
   name: string;
   data: T;
-  print: string;
-  trxId: string;
+  console: string;
+  txId: string;
   globalSequence: number;
-  receiveSequence: number;
-  actDigest: string;
+  authorization: {
+    actor: string;
+    permission: string;
+  }[];
 };

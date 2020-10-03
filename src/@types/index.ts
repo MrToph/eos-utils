@@ -85,3 +85,5 @@ export type TExtendedAsset = {
   amount: BigNumber;
   extSymbol: TExtendedSymbol;
 };
+
+export * from './dfuse';
