@@ -137,7 +137,7 @@ export class DfuseSearcher {
         traces.map(trace => {
           const blockNumber = Number.parseInt(trace.block.num, 10);
           const timestamp = new Date(trace.block.timestamp);
-          const txId = new Date(trace.id);
+          const txId = trace.id;
 
           return trace.matchingActions.map(actionTrace => {
             return {
