@@ -7,7 +7,7 @@ export const formatBlockExplorerTransaction = (blockExplorer: TBlockExplorer) =>
     case `bloks`:
       return `https://bloks.io/transaction/${transactionId}`;
     case `eosq`:
-      return `https://eosq.app/tx/${transactionId}`;
+      return `https://eos.eosq.eosnation.io/tx/${transactionId}`;
     default:
       throw new Error(`Unsupported block explorer: ${blockExplorer}`);
   }
