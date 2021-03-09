@@ -65,4 +65,8 @@ describe(`names`, () => {
     const encodedName = convertValue2NameSerialized(Long.fromString(`6138663591592764928`));
     expect(encodedName).toBe(`eosio.token`);
   });
+  it(`can convert names 5`, () => {
+    const encodedName = convertValue2NameSerialized(Long.fromString(`6138663577826885632`));
+    expect(encodedName).toBe(`eosio.token`);
+  });
 });
